@@ -1,0 +1,26 @@
+Assignment 1
+========================================================
+## Reading the data file
+```{r}
+ dataFile <- read.csv('activity.csv')
+```
+## Daily steps taken
+### Histogram of the total number of steps taken each day
+```{r}
+dailySteps <- aggregate(dataFile$steps,list(dataFile$date),sum,na.rm=TRUE)
+
+barplot(dailySteps$x, names.arg=as.Date(dailySteps$Group.1), ylab="Steps", xlab="Days")
+```
+### Daily mean steps
+```{r}
+dailyMeanSteps <- aggregate(dataFile$steps,list(dataFile$date),mean,na.rm=TRUE)
+colnames(dailyMeanSteps) <- c('date','steps')
+dailyMeanSteps <- replace(dailyMeanSteps,is.na(dailyMeanSteps),0)
+dailyMeanSteps
+```
+
+### Daily median steps
+```{r}
+dailyMedianSteps <- tapply(dataFile$steps,list(dataFile$date),median)
+dailyMedianSteps
+```
