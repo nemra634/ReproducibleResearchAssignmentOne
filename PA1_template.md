@@ -91,32 +91,128 @@ dailyMeanSteps
 
 ### Daily median steps
 
+
 ```r
-dailyMedianSteps <- tapply(dataFile$steps,list(dataFile$date),median)
-dailyMedianSteps
+medianFrame <- data.frame(date = character(0),median_steps=numeric(0))
+aaa <- numeric()
+dateVector <- as.vector(dataFile$date)
+stepsVector <- as.vector(dataFile$steps)
+
+for(i in seq_along(dateVector)){    
+    if(i==length(dateVector) || dateVector[i] != dateVector[i+1]){        
+        medianFrame <- rbind(medianFrame, data.frame(date = dateVector[i],median_steps = median(aaa)))
+        aaa = numeric()
+    }  
+    else if(!is.na(stepsVector[i])){
+            aaa <- c(aaa,stepsVector[i])           
+    }
+}
+medianFrame
 ```
 
 ```
-## 2012-10-01 2012-10-02 2012-10-03 2012-10-04 2012-10-05 2012-10-06 
-##         NA          0          0          0          0          0 
-## 2012-10-07 2012-10-08 2012-10-09 2012-10-10 2012-10-11 2012-10-12 
-##          0         NA          0          0          0          0 
-## 2012-10-13 2012-10-14 2012-10-15 2012-10-16 2012-10-17 2012-10-18 
-##          0          0          0          0          0          0 
-## 2012-10-19 2012-10-20 2012-10-21 2012-10-22 2012-10-23 2012-10-24 
-##          0          0          0          0          0          0 
-## 2012-10-25 2012-10-26 2012-10-27 2012-10-28 2012-10-29 2012-10-30 
-##          0          0          0          0          0          0 
-## 2012-10-31 2012-11-01 2012-11-02 2012-11-03 2012-11-04 2012-11-05 
-##          0         NA          0          0         NA          0 
-## 2012-11-06 2012-11-07 2012-11-08 2012-11-09 2012-11-10 2012-11-11 
-##          0          0          0         NA         NA          0 
-## 2012-11-12 2012-11-13 2012-11-14 2012-11-15 2012-11-16 2012-11-17 
-##          0          0         NA          0          0          0 
-## 2012-11-18 2012-11-19 2012-11-20 2012-11-21 2012-11-22 2012-11-23 
-##          0          0          0          0          0          0 
-## 2012-11-24 2012-11-25 2012-11-26 2012-11-27 2012-11-28 2012-11-29 
-##          0          0          0          0          0          0 
-## 2012-11-30 
-##         NA
+##          date median_steps
+## 1  2012-10-01           NA
+## 2  2012-10-02            0
+## 3  2012-10-03            0
+## 4  2012-10-04            0
+## 5  2012-10-05            0
+## 6  2012-10-06            0
+## 7  2012-10-07            0
+## 8  2012-10-08           NA
+## 9  2012-10-09            0
+## 10 2012-10-10            0
+## 11 2012-10-11            0
+## 12 2012-10-12            0
+## 13 2012-10-13            0
+## 14 2012-10-14            0
+## 15 2012-10-15            0
+## 16 2012-10-16            0
+## 17 2012-10-17            0
+## 18 2012-10-18            0
+## 19 2012-10-19            0
+## 20 2012-10-20            0
+## 21 2012-10-21            0
+## 22 2012-10-22            0
+## 23 2012-10-23            0
+## 24 2012-10-24            0
+## 25 2012-10-25            0
+## 26 2012-10-26            0
+## 27 2012-10-27            0
+## 28 2012-10-28            0
+## 29 2012-10-29            0
+## 30 2012-10-30            0
+## 31 2012-10-31            0
+## 32 2012-11-01           NA
+## 33 2012-11-02            0
+## 34 2012-11-03            0
+## 35 2012-11-04           NA
+## 36 2012-11-05            0
+## 37 2012-11-06            0
+## 38 2012-11-07            0
+## 39 2012-11-08            0
+## 40 2012-11-09           NA
+## 41 2012-11-10           NA
+## 42 2012-11-11            0
+## 43 2012-11-12            0
+## 44 2012-11-13            0
+## 45 2012-11-14           NA
+## 46 2012-11-15            0
+## 47 2012-11-16            0
+## 48 2012-11-17            0
+## 49 2012-11-18            0
+## 50 2012-11-19            0
+## 51 2012-11-20            0
+## 52 2012-11-21            0
+## 53 2012-11-22            0
+## 54 2012-11-23            0
+## 55 2012-11-24            0
+## 56 2012-11-25            0
+## 57 2012-11-26            0
+## 58 2012-11-27            0
+## 59 2012-11-28            0
+## 60 2012-11-29            0
+## 61 2012-11-30           NA
 ```
+
+### Average steps per interval
+
+```r
+intervalAvgSum <- 0
+intervalVector <- as.vector(dataFile$interval)
+avgDataFrame <- data.frame(interval=numeric(0),avg_steps=numeric(0))
+intervalAvg <- 0
+intervalMaxAvg <- -1
+maxAvgInterval <- 1
+for(i in seq_along(stepsVector)){
+         if(is.na(stepsVector[i])){
+              intervalAvgSum <- intervalAvgSum+0
+        }else{
+              intervalAvgSum <- intervalAvgSum+stepsVector[i]
+          }
+       intervalAvg <-intervalAvgSum/i  
+       avgDataFrame <- rbind(avgDataFrame, data.frame(interval=intervalVector[i],avg_steps=intervalAvg))     
+       
+       if(intervalAvg > intervalMaxAvg){
+          intervalMaxAvg <- intervalAvg
+          maxAvgInterval <- intervalVector[i]
+       }
+}
+plot(avgDataFrame$interval,avgDataFrame$avg_steps,type="l")
+```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+### The interval containing the maximum steps on average is 915 with value equal to 37.3428514
+
+## Missing values
+
+
+```r
+missingValueRowCount <- 0
+for(i in seq_along(stepsVector)){
+    if(is.na(intervalVector[i]) || is.na(stepsVector[i]) || is.na(dateVector[i])){
+        missingValueRowCount <- missingValueRowCount+1
+    }
+}
+```
+## There are 2304 rows with missing(NA) values

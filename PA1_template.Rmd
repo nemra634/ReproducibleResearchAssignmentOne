@@ -20,7 +20,60 @@ dailyMeanSteps
 ```
 
 ### Daily median steps
+
 ```{r}
-dailyMedianSteps <- tapply(dataFile$steps,list(dataFile$date),median)
-dailyMedianSteps
+medianFrame <- data.frame(date = character(0),median_steps=numeric(0))
+aaa <- numeric()
+dateVector <- as.vector(dataFile$date)
+stepsVector <- as.vector(dataFile$steps)
+
+for(i in seq_along(dateVector)){    
+    if(i==length(dateVector) || dateVector[i] != dateVector[i+1]){        
+        medianFrame <- rbind(medianFrame, data.frame(date = dateVector[i],median_steps = median(aaa)))
+        aaa = numeric()
+    }  
+    else if(!is.na(stepsVector[i])){
+            aaa <- c(aaa,stepsVector[i])           
+    }
+}
+medianFrame
 ```
+
+### Average steps per interval
+```{r}
+intervalAvgSum <- 0
+intervalVector <- as.vector(dataFile$interval)
+avgDataFrame <- data.frame(interval=numeric(0),avg_steps=numeric(0))
+intervalAvg <- 0
+intervalMaxAvg <- -1
+maxAvgInterval <- 1
+for(i in seq_along(stepsVector)){
+         if(is.na(stepsVector[i])){
+              intervalAvgSum <- intervalAvgSum+0
+        }else{
+              intervalAvgSum <- intervalAvgSum+stepsVector[i]
+          }
+       intervalAvg <-intervalAvgSum/i  
+       avgDataFrame <- rbind(avgDataFrame, data.frame(interval=intervalVector[i],avg_steps=intervalAvg))     
+       
+       if(intervalAvg > intervalMaxAvg){
+          intervalMaxAvg <- intervalAvg
+          maxAvgInterval <- intervalVector[i]
+       }
+}
+plot(avgDataFrame$interval,avgDataFrame$avg_steps,type="l")
+
+```
+### The interval containing the maximum steps on average is `r maxAvgInterval` with value equal to `r intervalMaxAvg`
+
+## Missing values
+
+```{r}
+missingValueRowCount <- 0
+for(i in seq_along(stepsVector)){
+    if(is.na(intervalVector[i]) || is.na(stepsVector[i]) || is.na(dateVector[i])){
+        missingValueRowCount <- missingValueRowCount+1
+    }
+}
+```
+## There are `r missingValueRowCount` rows with missing(NA) values
