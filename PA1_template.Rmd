@@ -76,4 +76,70 @@ for(i in seq_along(stepsVector)){
     }
 }
 ```
-## There are `r missingValueRowCount` rows with missing(NA) values
+### There are `r missingValueRowCount` rows with missing(NA) values  
+
+### As such missing values are only present in steps column we desided to replace them with average of mean steps per interval, see code below
+```{r}
+intervalMeanSteps <- aggregate(dataFile$steps,list(dataFile$interval),mean,na.rm=TRUE)
+colnames(intervalMeanSteps) <- c('interval','steps')
+intervalMeanSteps <- replace(intervalMeanSteps,is.na(intervalMeanSteps),0)
+intervalMeanStepsVector <- as.vector(intervalMeanSteps$steps)
+intervalMeanAverage <- 0
+intervalMeanSum <- 0
+for(i in seq_along(intervalMeanStepsVector)){
+          if(!is.na(intervalMeanStepsVector[i])){
+                intervalMeanSum <- intervalMeanSum+intervalMeanStepsVector[i]
+              }
+      }
+  intervalMeanAverage <- intervalMeannSum/length(intervalMeanStepsVector)
+  intervalMeanAverage
+
+for(i in seq_along(stepsVector)){
+  if(is.na(stepsVector[i])){
+      stepsVector[i] <- intervalMeanAverage
+  }
+}
+```
+### Creating a new dataset with the following code: 
+
+```{r}
+newDataSet <- data.frame(steps<-stepsVector,date<-dateVector,interval<-intervalVector)  
+```
+
+### Making a histogram of the total number of steps taken each day and calculate and report mean and median total number of steps taken per day according to the new data set
+
+1. Histogram of the total number of steps taken each day
+```{r}
+newDailySteps <- aggregate(newDataSet$steps,list(newDataSet$date),sum,na.rm=TRUE)
+
+barplot(newDailySteps$x, names.arg=as.Date(newDailySteps$Group.1), ylab="Steps", xlab="Days")
+```
+
+2. Daily mean steps
+```{r}
+newDailyMeanSteps <- aggregate(newDataSet$steps,list(newDataSet$date),mean,na.rm=TRUE)
+colnames(newDailyMeanSteps) <- c('date','steps')
+newDailyMeanSteps <- replace(newDailyMeanSteps,is.na(newDailyMeanSteps),0)
+newDailyMeanSteps
+```
+
+3. Daily median steps
+
+```{r}
+newMedianFrame <- data.frame(date = character(0),median_steps=numeric(0))
+bbb <- numeric()
+newDateVector <- as.vector(newDataSet$date)
+newStepsVector <- as.vector(newDataSet$steps)
+
+for(i in seq_along(newDateVector)){    
+    if(i==length(newDateVector) || newDateVector[i] != newDateVector[i+1]){        
+        newMedianFrame <- rbind(newMedianFrame, data.frame(date = newDateVector[i],median_steps = median(bbb)))
+        bbb = numeric()
+    }  
+    else if(!is.na(newStepsVector[i])){
+            bbb <- c(bbb,newStepsVector[i])           
+    }
+}
+newMedianFrame
+```
+### These values differ a bit from the estimates from the first part of the assignment.
